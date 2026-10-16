@@ -1,0 +1,15 @@
+{
+  "name": "karylcode-mods",
+  "description": "Karylcode 的 Claude Code MOD",
+  "owner": {
+    "name": "Karylcode",
+    "url": "https://github.com/Karylcode"
+  },
+  "plugins": [
+    {
+      "name": "grill",
+      "source": "./",
+      "description": "拷問模式：一次問一題、按按鈕作答，問完幫你寫成計畫"
+    }
+  ]
+}

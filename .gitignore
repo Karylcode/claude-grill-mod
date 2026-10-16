@@ -1,0 +1,3 @@
+# Claude Code 每次載入時自己產生的型別和設定
+.claude-plugin/types/
+tsconfig.json
