@@ -279,6 +279,7 @@ export const register: Register = on => {
           <Button key="markdown" hotkey="1" variant="primary" label="Markdown" onPress={writePlan(WRITE_MARKDOWN)} />
           <Button key="html" hotkey="2" label="HTML" onPress={writePlan(WRITE_HTML)} />
           <Button key="more" hotkey="3" label="繼續提問" onPress={more} />
+          <Button key="close" hotkey="4" label="關閉" onPress={() => reset($)} />
         </Box>
       )
     }

@@ -31,7 +31,8 @@ Traditional Chinese.
 - **Interrupt**: if Claude drifts, press 中斷拷問 above the prompt box. The running turn stops, and Claude sums
   up what is decided, where it drifted and what is left. Then pick 繼續拷問 (continue) or 不問了 (stop).
 - **Plan at the end**: when the questions run out, Claude calls `mcp__grill__finish` and lists the decisions and
-  open branches. The band switches to 編寫計畫 with Markdown, HTML and 繼續提問 (ask more). The plan covers the
+  open branches. The band switches to 編寫計畫 with Markdown, HTML, 繼續提問 (ask more) and 關閉 (close the
+  band without writing a plan). The plan covers the
   goal, each decision with a one-line reason, what is still open, and next steps. Claude saves it in the
   current working folder, named after the topic, and tells you the path.
 - **Decisions survive compaction**: if the conversation is compacted during a grill, the summary copies the
@@ -58,7 +59,7 @@ Traditional Chinese.
 
 2. Start with `/grill:grill <topic>`, or just ask 「幫我決定…」 or 「給我建議…」. With no topic, Claude grills
    what you are already discussing.
-3. Answer each card. When the questions run out, pick Markdown, HTML or 繼續提問 above the prompt box.
+3. Answer each card. When the questions run out, pick Markdown, HTML, 繼續提問 or 關閉 above the prompt box.
 
 Auto-trigger is on by default. `/grill-auto off` turns it off, `/grill-auto on` turns it back on, and
 `/grill-auto` alone shows the current setting. The setting is kept across sessions.

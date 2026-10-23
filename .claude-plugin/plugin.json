@@ -1,6 +1,6 @@
 {
   "name": "grill",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "拷問模式：一次問一題、按按鈕作答、自動觸發、顯示預估題數，問完幫你寫成計畫（規則改寫自 mattpocock/skills 的 grilling，MIT）",
   "author": { "name": "Karylcode", "url": "https://github.com/Karylcode" },
   "homepage": "https://github.com/Karylcode/claude-grill-mod",

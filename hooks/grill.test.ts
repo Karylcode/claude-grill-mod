@@ -116,6 +116,7 @@ test('問完呼叫 finish，換成編寫計畫和三個選項', async ($, on) =>
     expect(await ui.find({ key: 'markdown' })).toBeDefined()
     expect(await ui.find({ key: 'html' })).toBeDefined()
     expect(await ui.find({ key: 'more' })).toBeDefined()
+    expect(await ui.find({ key: 'close' })).toBeDefined()
     await ui.unmount()
   }
 })
@@ -257,4 +258,23 @@ test('外掛裡的 /grill:grill 也會進入拷問中，別的 skill 不會', as
   await $.skill.prompt({ skill: 'grill:grill', text: '進入拷問模式，主題：做遊戲' })
   const after = await $.ui.mount({ plugin: 'grill', surface: 'desktop', ...BAND })
   expect(await after.find({ type: 'Text', text: '拷問中' })).toBeDefined()
+})
+
+test('編寫計畫按關閉：那條直接收起來，不送出任何訊息', async ($, on) => {
+  world(on)
+  answerWith(on, 'UE5')
+  const submitted: string[] = []
+  on('prompt.submit', ($, e) => {
+    submitted.push(e.text)
+    return { text: e.text }
+  })
+  await $.tool.call(ask('grill:3'))
+  await $.tool.call({ tool: 'mcp__grill__finish', tool_use_id: 'f1' })
+
+  const ui = await $.ui.mount({ plugin: 'grill', surface: 'desktop', ...BAND })
+  await ui.press({ key: 'close' })
+  expect(submitted).toHaveLength(0)
+
+  const gone = await $.ui.mount({ plugin: 'grill', surface: 'desktop', ...BAND })
+  expect(await gone.find({ type: 'Text', text: /編寫計畫|拷問中/ })).toBeUndefined()
 })
