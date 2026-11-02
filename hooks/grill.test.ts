@@ -96,6 +96,26 @@ test('別的 session 傳來的訊息不提醒拷問，改成提醒別因為它�
   expect(task.context ?? []).toHaveLength(0)
 })
 
+test('origin 沒標對時看內容：別的 session 的訊息、背景通知都不提醒拷問', async ($, on) => {
+  world(on)
+  on('prompt.submit', ($, e) => ({ text: e.text, context: e.context }))
+
+  const peer = await $.prompt.submit({
+    text: '<cross-session-message from="local_x" from-name="效能優化">要不要幫我決定用哪個？</cross-session-message>',
+    wait: false,
+    origin: { kind: 'unclassified' },
+  })
+  expect(peer.context?.join(' ')).toMatch(/不是使用者本人/)
+  expect(peer.context?.join(' ')).not.toMatch(/一次問一題/)
+
+  const notice = await $.prompt.submit({
+    text: '<side-sessions-event>布料物理說：不進拷問模式</side-sessions-event>',
+    wait: false,
+    origin: PERSON,
+  })
+  expect(notice.context ?? []).toHaveLength(0)
+})
+
 test('上方列顯示預估題數，預估會跟著每次出題調整', async ($, on) => {
   world(on)
   answerWith(on, 'Unity（建議）')

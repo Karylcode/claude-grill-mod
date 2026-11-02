@@ -66,6 +66,10 @@ const OTHER_SESSION = new Set<string>(['peer', 'peer-send-message', 'projects-re
 // 背景工作、排程、觀察者送來的：也不是使用者本人打的
 const NOT_PERSON = new Set<string>(['task-notification', 'scheduled-trigger', 'observer', 'observer-activity'])
 
+// 保險：桌面版轉來的訊息 origin 不一定標對，再看內容裡的標記
+const PEER_MARK = /<cross-session-message[\s>]|Another Claude session sent a message/
+const NOTICE_MARK = /<side-sessions-event>|<task-notification>/
+
 // metadata.source 的格式："grill" 或 "grill:10"
 const SOURCE = /^grill(?::\s*(\d+))?$/
 
@@ -158,10 +162,11 @@ export const register: Register = on => {
     if (e.origin.kind === 'plugin' || NOT_PERSON.has(e.origin.kind)) return next(e)
 
     // 別的 session 傳來的不提醒拷問，反過來提醒別因為它拷問（不然子 session 停下來問，又傳給主 session 再問一次）
-    if (OTHER_SESSION.has(e.origin.kind)) {
+    if (OTHER_SESSION.has(e.origin.kind) || PEER_MARK.test(e.text)) {
       if (!(await read($, isAuto))) return next(e)
       return next({ ...e, context: [...(e.context ?? []), FROM_SESSION] })
     }
+    if (NOTICE_MARK.test(e.text)) return next(e)
 
     // 停在「編寫計畫」時自己打字，代表不用那三個選項了，收起來
     if ((await read($, isActive)) && (await read($, phase)) === 'planning') await reset($)
