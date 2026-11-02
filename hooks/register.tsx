@@ -38,6 +38,9 @@ const FINISHED =
 const NUDGE =
   '（grill mod）這則訊息可能是要建議或做決定。如果牽涉好幾個還沒定的分支，照系統提示的「拷問模式」做：用 AskUserQuestion 一次問一題。只是單一簡單問題就直接回答。'
 
+const FROM_SESSION =
+  '（grill mod）這則是別的 Claude session 傳來的，不是使用者本人打的：不要因為它進拷問模式、自己一題一題問。要使用者決定的事照你們的分工處理。'
+
 const INTERRUPT =
   '中斷拷問：先不要再出題。整理目前狀況：已經決定了哪些、從哪裡開始偏離主題、還剩哪些沒問。整理完等我決定要不要繼續。'
 
@@ -56,6 +59,12 @@ const MORE = '繼續提問：往下問還沒處理的分支或需要更細的地
 
 const TRIGGER =
   /拷問|grill|幫我(決定|選|想想|規劃|企劃)|給(我)?(點|一些)?建議|怎麼(選|決定)|該(選|用)哪|要不要|規劃|企劃/i
+
+// 別的 session 傳來的訊息：使用者不在場，不能拷問
+const OTHER_SESSION = new Set<string>(['peer', 'peer-send-message', 'projects-relay', 'coordinator'])
+
+// 背景工作、排程、觀察者送來的：也不是使用者本人打的
+const NOT_PERSON = new Set<string>(['task-notification', 'scheduled-trigger', 'observer', 'observer-activity'])
 
 // metadata.source 的格式："grill" 或 "grill:10"
 const SOURCE = /^grill(?::\s*(\d+))?$/
@@ -146,7 +155,13 @@ export const register: Register = on => {
   })
 
   on('prompt.submit', async ($, e, next) => {
-    if (e.origin.kind === 'plugin') return next(e)
+    if (e.origin.kind === 'plugin' || NOT_PERSON.has(e.origin.kind)) return next(e)
+
+    // 別的 session 傳來的不提醒拷問，反過來提醒別因為它拷問（不然子 session 停下來問，又傳給主 session 再問一次）
+    if (OTHER_SESSION.has(e.origin.kind)) {
+      if (!(await read($, isAuto))) return next(e)
+      return next({ ...e, context: [...(e.context ?? []), FROM_SESSION] })
+    }
 
     // 停在「編寫計畫」時自己打字，代表不用那三個選項了，收起來
     if ((await read($, isActive)) && (await read($, phase)) === 'planning') await reset($)

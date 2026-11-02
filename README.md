@@ -27,7 +27,9 @@ Traditional Chinese.
 - **Rules in the system prompt**: the grill rules go into the system prompt every turn (with auto-trigger off,
   only during a grill). Grilling does not depend on Claude choosing to load a skill, so it triggers more reliably.
 - **Auto-trigger**: when your message contains words like 拷問, grill, 幫我決定, 給我建議, 怎麼選, 要不要, 規劃
-  or 企劃, the mod reminds Claude to consider grill mode. A simple question still gets a direct answer.
+  or 企劃, the mod reminds Claude to consider grill mode. A simple question still gets a direct answer. Only
+  messages you type count: a message from another Claude session (SendMessage) never triggers it and instead
+  tells Claude not to start grilling over it; background task notices and scheduled prompts don't trigger it.
 - **Interrupt**: if Claude drifts, press 中斷拷問 above the prompt box. The running turn stops, and Claude sums
   up what is decided, where it drifted and what is left. Then pick 繼續拷問 (continue) or 不問了 (stop).
 - **Plan at the end**: when the questions run out, Claude calls `mcp__grill__finish` and lists the decisions and

@@ -84,6 +84,18 @@ test('要建議或決定的訊息會多一句提醒，一般訊息不會', async
   expect(plain.context ?? []).toHaveLength(0)
 })
 
+test('別的 session 傳來的訊息不提醒拷問，改成提醒別因為它拷問；背景通知什麼都不加', async ($, on) => {
+  world(on)
+  on('prompt.submit', ($, e) => ({ text: e.text, context: e.context }))
+
+  const peer = await $.prompt.submit({ text: '幫我決定要用哪個引擎', wait: false, origin: { kind: 'peer' } })
+  expect(peer.context?.join(' ')).toMatch(/不是使用者本人/)
+  expect(peer.context?.join(' ')).not.toMatch(/一次問一題/)
+
+  const task = await $.prompt.submit({ text: '幫我決定要用哪個引擎', wait: false, origin: { kind: 'task-notification' } })
+  expect(task.context ?? []).toHaveLength(0)
+})
+
 test('上方列顯示預估題數，預估會跟著每次出題調整', async ($, on) => {
   world(on)
   answerWith(on, 'Unity（建議）')
